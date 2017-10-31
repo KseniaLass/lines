@@ -3,7 +3,7 @@ const $ground = $('#ground');
 const size = 9;
 const line = [];
 
-const items = ['aubergine.svg', 'beer.svg', 'carrot.svg', 'rice.svg', 'watermelon.svg'];
+const items = ['aubergine.svg', 'beer.svg', 'carrot.svg', 'rice.svg', 'watermelon.svg', 'cup.svg'];
 
 let firstRandom = true;
 
@@ -25,21 +25,33 @@ function setRandomItems() {
   if(firstRandom) {
     let i = 0;
     while(i < 3) {
-      let x = generateRandom(1, 9);
-      let y = generateRandom(1, 9);
-      let item = generateRandom(0, items.length);
+      let coord = generateRandomCoord();
+      let item = generateRandomItem();
 
-      $ground.find(`td[data-x="${x}"][data-y="${y}"]`).append(`<img src="img/${items[item]}"/>`)
+      $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).append(`<img src="img/${item}"/>`)
 
       i++;
     }
   }
 }
 
-function generateRandom(min, max) {
-  return Math.floor(Math.random() * (max-min))+min
+function generateRandomCoord() {
+  let coord = {
+    x: Math.floor(Math.random() * (size - 1)) + 1,
+    y: Math.floor(Math.random() * (size - 1)) + 1
+  };
+  if(checkBusyCell(coord)) {
+    return coord;
+  } else {
+    generateRandomCoord();
+  }
 }
-console.log(generateRandom(0, 9))
+function generateRandomItem() {
+  return items[Math.floor(Math.random() * (items.length - 1)) + 1]
+}
+function checkBusyCell(coord) {
+  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).is(':empty') ? true : false
+}
 
 createCells();
 setRandomItems();
