@@ -1,0 +1,19 @@
+table {
+    border: 1px solid;
+    width:500px;
+    height: 500px;
+}
+tr{
+    border: 1px solid;
+}
+td {
+    border: 1px solid;
+    text-align: center;
+    height:50px;
+    width: 50px;
+}
+
+img {
+    max-width:90%;
+    max-height:90%;
+}
