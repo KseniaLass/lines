@@ -2,7 +2,7 @@ const $ground = $('#ground');
 
 const size = 9;
 
-const items = ['aubergine.svg', 'beer.svg', 'carrot.svg', 'rice.svg', 'watermelon.svg', 'cup.svg'];
+const items = ['img/aubergine.svg', 'img/beer.svg', 'img/carrot.svg', 'img/rice.svg', 'img/watermelon.svg', 'img/cup.svg'];
 
 let firstRandom = true;
 
@@ -40,11 +40,20 @@ function setRandomItems() {
       let coord = generateRandomCoord();
       let item = generateRandomItem();
 
-      $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).attr('data-busy', true).append(`<img src="img/${item}"/>`)
+      drawItem(coord.x, coord.y, item)
 
       i++;
     }
   }
+}
+
+// Рисуем предмет по координатам
+function drawItem(x, y, item) {
+  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-busy', true).append(`<img src="${item}"/>`)
+}
+
+function removeItem(x, y) {
+  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-busy', false).empty();
 }
 
 // Генерация случайных координат
@@ -71,20 +80,54 @@ function checkBusyCell(coord) {
 }
 
 // Перемещение
-function moveTo(x, y, target) {
+function moveTo(x, y) {
   let item = $('.selected').find('img');
 
-  let selectCoord = [$('.selected').data('x'), $('.selected').data('y')];
-  let movetoCoord = [x, y];
+  let select = [$('.selected').data('x'), $('.selected').data('y')];
+  let target = [x, y];
 
-  $(target).append(`<img src="${SELECT_ITEM}"/>`);
-  $('.selected').removeClass('selected').empty();
+  let Way = createWayCoord(select[0], target[0], select[1], target[1]);
 
-  console.log(target)
+  Way.forEach(function(item,i){
+    console.log(item)
+    drawItem(item.x, item.y, SELECT_ITEM)
+  });
+
+  // $(target).attr('data-busy', true).append(`<img src="${SELECT_ITEM}"/>`);
+  // $('.selected').removeClass('selected').empty();
+
+  checkLine(x,y)
 }
 
-// Получить координаты выбранного предмета
-function getItemCoord(e) {
+function createWayCoord(xStart, xEnd, yStart, yEnd) {
+  var result = [];
+  if (xStart < xEnd) {
+    while(xStart !== xEnd && xStart > 0) {
+      xStart = xStart + 1;
+      result.push({x: xStart, y: yStart})
+    }
+  } else if(xStart > xEnd) {
+    while(xStart !== xEnd && xStart < size) {
+      xStart = xStart - 1;
+      result.push({x: xStart, y: yStart})
+    }
+  }
+  if(yStart < yEnd) {
+    while(yStart !== yEnd && yStart > 0) {
+      yStart = yStart + 1;
+      result.push({x: xStart, y: yStart})
+    }
+  } else if(yStart > yEnd) {
+    while(yStart !== yEnd && yStart < size) {
+      yStart = yStart - 1;
+      result.push({x: xStart, y: yStart})
+    }
+  }
+
+  return result
+}
+
+function checkLine(x,y) {
 
 }
 
