@@ -2,6 +2,7 @@ table {
     border: 1px solid;
     width:500px;
     height: 500px;
+    table-layout: fixed;
 }
 tr{
     border: 1px solid;
@@ -13,9 +14,24 @@ td {
     width: 50px;
 }
 
+td[data-busy="true"] {
+    cursor: pointer;
+}
+
 img {
-    max-width:90%;
-    max-height:90%;
+    width:90%;
+    height:90%;
     vertical-align: middle;
     cursor: pointer;
+}
+
+@keyframes jump {
+
+    0%   {transform: translate3d(0,0,0) scale3d(1,1,1);}
+    40%  {transform: translate3d(0,-5%,0) scale3d(.95,1.1,1);}
+    100% {transform: translate3d(0,-10%,0) scale3d(1,0.9,1);}
+}
+.selected img {
+    transform-origin: 50% 50%;
+    animation: jump .5s linear alternate infinite;
 }
