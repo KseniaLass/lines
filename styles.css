@@ -12,9 +12,10 @@ td {
     text-align: center;
     height:50px;
     width: 50px;
+    cursor: pointer;
 }
 
-td[data-busy="true"] {
+td[data-content="busy"] {
     cursor: pointer;
 }
 

@@ -25,7 +25,7 @@ function createCells() {
   for(let i=1; i < size+1; i++) {
     let td = '';
     for(let j=1; j < size+1; j++) {
-      td += `<td data-y=${i} data-x=${j} data-busy="false"></td>`;
+      td += `<td data-y=${i} data-x=${j} data-content="free">${i} ${j}</td>`;
     }
     tr += `<tr> ${td} </tr>`;
   }
@@ -49,11 +49,11 @@ function setRandomItems() {
 
 // Рисуем предмет по координатам
 function drawItem(x, y, item) {
-  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-busy', true).append(`<img src="${item}"/>`)
+  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-content', 'busy').append(`<img src="${item}"/>`)
 }
 
 function removeItem(x, y) {
-  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-busy', false).empty();
+  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-content', 'free').empty();
 }
 
 // Генерация случайных координат
@@ -67,6 +67,7 @@ function generateRandomCoord() {
     console.log(coord)
     return coord;
   } else {
+    console.log(coord)
     generateRandomCoord();
   }
 }
@@ -78,7 +79,7 @@ function generateRandomItem() {
 
 // Проверка занята ли ячейка
 function checkBusyCell(coord) {
-  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).is(':empty') ? coord : false
+  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).attr('data-content') === 'free' ? coord : false
 }
 
 // Перемещение
@@ -106,38 +107,44 @@ function createWayCoord(xStart, xEnd, yStart, yEnd) {
   var x = xStart;
   var y = yStart;
   //if (xStart < xEnd) {
+
   while(x !== xEnd) {
-    x = x + 1;
 
-    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
-
-    if(!checkBusyCell({x: x, y: y})) {
+    if(x < xEnd) {
+      x = x + 1;
+    } else if (x > xEnd) {
       x = x - 1;
-      y = y + 1;
-    } else {
-      result.push({x: x, y: y})
+    } else if (x > size) {
+      x = 0
     }
-
-
-    if(x === size) {
-      x = 0;
-    }
-
-  }
-  while(y !== yEnd) {
-    y = y + 1;
 
     console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
 
     if(!checkBusyCell({x: x, y: y})) {
       x = x + 1;
-      y = y - 1;
+      y = y + 1;
     } else {
       result.push({x: x, y: y})
     }
 
-    if(y === size) {
-      y = 0;
+  }
+
+  while(y !== yEnd) {
+    if(y < yEnd) {
+      y = y + 1;
+    } else if (y > yEnd) {
+      y = y - 1;
+    } else if (y > size) {
+      y = 0
+    }
+
+    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
+
+    if(!checkBusyCell({x: x, y: y})) {
+      x = x + 1;
+      y = y + 1;
+    } else {
+      result.push({x: x, y: y})
     }
 
   }
@@ -172,7 +179,7 @@ function checkLine(x,y) {
 //createCells();
 setRandomItems();
 
-$('body').on('click', 'td[data-busy="true"]', function(e){
+$('body').on('click', 'td[data-content="busy"]', function(e){
   let $target = $(e.target).closest('td') || $(e.target);
   if(!$target.hasClass('selected')) {
     $ground.find('.selected').removeClass('selected');
@@ -186,7 +193,7 @@ $('body').on('click', 'td[data-busy="true"]', function(e){
   }
 });
 
-$('body').on('click', 'td[data-busy="false"]', function(e){
+$('body').on('click', 'td[data-content="free"]', function(e){
   if(!SELECT) {
     return false
   }
