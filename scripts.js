@@ -25,7 +25,7 @@ function createCells() {
   for(let i=1; i < size+1; i++) {
     let td = '';
     for(let j=1; j < size+1; j++) {
-      td += `<td data-y=${i} data-x=${j} data-busy="false">`;
+      td += `<td data-y=${i} data-x=${j} data-busy="false"></td>`;
     }
     tr += `<tr> ${td} </tr>`;
   }
@@ -63,6 +63,8 @@ function generateRandomCoord() {
     y: Math.floor(Math.random() * (size - 1)) + 1
   };
   if(checkBusyCell(coord)) {
+
+    console.log(coord)
     return coord;
   } else {
     generateRandomCoord();
@@ -76,7 +78,7 @@ function generateRandomItem() {
 
 // Проверка занята ли ячейка
 function checkBusyCell(coord) {
-  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).is(':empty') ? true : false
+  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).is(':empty') ? coord : false
 }
 
 // Перемещение
@@ -101,31 +103,65 @@ function moveTo(x, y) {
 
 function createWayCoord(xStart, xEnd, yStart, yEnd) {
   var result = [];
-  if (xStart < xEnd) {
-    while(xStart !== xEnd && xStart > 0) {
-      xStart = xStart + 1;
-      result.push({x: xStart, y: yStart})
+  var x = xStart;
+  var y = yStart;
+  //if (xStart < xEnd) {
+  while(x !== xEnd) {
+    x = x + 1;
+
+    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
+
+    if(!checkBusyCell({x: x, y: y})) {
+      x = x - 1;
+      y = y + 1;
+    } else {
+      result.push({x: x, y: y})
     }
-  } else if(xStart > xEnd) {
-    while(xStart !== xEnd && xStart < size) {
-      xStart = xStart - 1;
-      result.push({x: xStart, y: yStart})
+
+
+    if(x === size) {
+      x = 0;
     }
+
   }
-  if(yStart < yEnd) {
-    while(yStart !== yEnd && yStart > 0) {
-      yStart = yStart + 1;
-      result.push({x: xStart, y: yStart})
+  while(y !== yEnd) {
+    y = y + 1;
+
+    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
+
+    if(!checkBusyCell({x: x, y: y})) {
+      x = x + 1;
+      y = y - 1;
+    } else {
+      result.push({x: x, y: y})
     }
-  } else if(yStart > yEnd) {
-    while(yStart !== yEnd && yStart < size) {
-      yStart = yStart - 1;
-      result.push({x: xStart, y: yStart})
+
+    if(y === size) {
+      y = 0;
     }
+
   }
+  //} else if(xStart > xEnd) {
+  //   while(xStart !== xEnd && xStart < size) {
+  //     xStart = xStart - 1;
+  //     result.push({x: xStart, y: yStart})
+  //   }
+  //}
+  // if(yStart < yEnd) {
+  //   while(yStart !== yEnd && yStart > 0) {
+  //     yStart = yStart + 1;
+  //     result.push({x: xStart, y: yStart})
+  //   }
+  // } else if(yStart > yEnd) {
+  //   while(yStart !== yEnd && yStart < size) {
+  //     yStart = yStart - 1;
+  //     result.push({x: xStart, y: yStart})
+  //   }
+  // }
 
   return result
 }
+
 
 function checkLine(x,y) {
 
