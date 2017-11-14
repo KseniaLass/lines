@@ -36,3 +36,7 @@ img {
     transform-origin: 50% 50%;
     animation: jump .5s linear alternate infinite;
 }
+
+canvas {
+    cursor: pointer;
+}
