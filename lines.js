@@ -21,14 +21,14 @@
     canvas = $('#gameCanvas')[0];
     canvas.width = worldWidth * tileWidth;
     canvas.height = worldHeight * tileHeight;
-    canvas.click(canvasClick, false);
     ctx = canvas.getContext('2d');
     spritesheet = new Image();
     spritesheet.src = 'img/spritesheet.png';
     spritesheet.onload = loaded;
   });
-
-  function canvasClick(){}
+  $('#gameCanvas').on('click', function(e){
+		canvasClick(e);
+  });
 
   function loaded(){
     console.log("Картинка загружена");
@@ -50,8 +50,8 @@
   function createRandomBalls() {
     console.log('Расставляем шарики...');
     for(let i=0; i<3; i++) {
-      let randomX = Math.floor(Math.random() * (worldWidth - 0)) + 0;
-      let randomY = Math.floor(Math.random() * (worldHeight - 0)) + 0;
+      let randomX = Math.floor(Math.random() * worldWidth);
+      let randomY = Math.floor(Math.random() * worldHeight);
       let randomFigure = Math.floor(Math.random() * (figureCount+1 - 1)) + 1;
       if(world[randomX][randomY] === 0) {
         world[randomX][randomY] = randomFigure
@@ -86,6 +86,47 @@
       }
     }
   }
+
+	function canvasClick(e)
+	{
+		let x;
+		let y;
+
+		// grab html page coords
+		if (e.pageX != undefined && e.pageY != undefined)
+		{
+			x = e.pageX;
+			y = e.pageY;
+		}
+		else
+		{
+			x = e.clientX + document.body.scrollLeft +
+				document.documentElement.scrollLeft;
+			y = e.clientY + document.body.scrollTop +
+				document.documentElement.scrollTop;
+		}
+
+		// make them relative to the canvas only
+		x -= canvas.offsetLeft;
+		y -= canvas.offsetTop;
+
+		// return tile x,y that we clicked
+		let cell =
+			[
+				Math.floor(x/tileWidth),
+				Math.floor(y/tileHeight)
+			];
+
+		// now we know while tile we clicked
+		console.log('we clicked tile '+cell[0]+','+cell[1]);
+
+		pathStart = pathEnd;
+		pathEnd = cell;
+
+		// calculate path
+		//currentPath = findPath(world,pathStart,pathEnd);
+		//redraw();
+	}
 
 
 
