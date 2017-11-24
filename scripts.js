@@ -16,188 +16,35 @@ let MOVETO_Y = 0;
 
 let SELECT_ITEM = '';
 
-$ground.append(createCells());
+let WORLD = [[]];
 
+createWorld();
 
-// Создаем поле
-function createCells() {
-  let tr = '';
-  for(let i=1; i < size+1; i++) {
-    let td = '';
-    for(let j=1; j < size+1; j++) {
-      td += `<td data-y=${i} data-x=${j} data-content="free">${i} ${j}</td>`;
-    }
-    tr += `<tr> ${td} </tr>`;
-  }
-  return tr
+function createWorld(){
+	console.log('Создание мира...');
+	for(let x = 0; x < size; x++) {
+		WORLD[x] = [];
+		for(let y=0; y < size; y++) {
+			WORLD[x][y] = 0;
+		}
+	}
+	createRandomBalls();
+	console.log(WORLD)
 }
 
-// Заполняем случайные ячейки
-function setRandomItems() {
-  if(firstRandom) {
-    let i = 0;
-    while(i < 3) {
-      let coord = generateRandomCoord();
-      let item = generateRandomItem();
-
-      drawItem(coord.x, coord.y, item)
-
-      i++;
-    }
-  }
+function createRandomBalls() {
+	console.log('Расставляем шарики...');
+	for(let i=0; i<3; i++) {
+		let randomX = Math.floor(Math.random() * size);
+		let randomY = Math.floor(Math.random() * size);
+		let randomFigure = Math.floor(Math.random() * (items.length+1 - 1)) + 1;
+		if(WORLD[randomX][randomY] === 0) {
+			WORLD[randomX][randomY] = randomFigure
+		} else {
+			i--;
+			break;
+		}
+	}
+	//redraw();
 }
-
-// Рисуем предмет по координатам
-function drawItem(x, y, item) {
-  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-content', 'busy').append(`<img src="${item}"/>`)
-}
-
-function removeItem(x, y) {
-  $ground.find(`td[data-x="${x}"][data-y="${y}"]`).attr('data-content', 'free').empty();
-}
-
-// Генерация случайных координат
-function generateRandomCoord() {
-  let coord = {
-    x: Math.floor(Math.random() * (size - 1)) + 1,
-    y: Math.floor(Math.random() * (size - 1)) + 1
-  };
-  if(checkBusyCell(coord)) {
-
-    console.log(coord)
-    return coord;
-  } else {
-    console.log(coord)
-    generateRandomCoord();
-  }
-}
-
-// Генерация случайного предмета
-function generateRandomItem() {
-  return items[Math.floor(Math.random() * (items.length - 1)) + 1]
-}
-
-// Проверка занята ли ячейка
-function checkBusyCell(coord) {
-  return $ground.find(`td[data-x="${coord.x}"][data-y="${coord.y}"]`).attr('data-content') === 'free' ? coord : false
-}
-
-// Перемещение
-function moveTo(x, y) {
-  let item = $('.selected').find('img');
-
-  let select = [$('.selected').data('x'), $('.selected').data('y')];
-  let target = [x, y];
-
-  let Way = createWayCoord(select[0], target[0], select[1], target[1]);
-
-  Way.forEach(function(item,i){
-    console.log(item)
-    drawItem(item.x, item.y, SELECT_ITEM)
-  });
-
-  // $(target).attr('data-busy', true).append(`<img src="${SELECT_ITEM}"/>`);
-  // $('.selected').removeClass('selected').empty();
-
-  checkLine(x,y)
-}
-
-function createWayCoord(xStart, xEnd, yStart, yEnd) {
-  var result = [];
-  var x = xStart;
-  var y = yStart;
-  //if (xStart < xEnd) {
-
-  while(x !== xEnd) {
-
-    if(x < xEnd) {
-      x = x + 1;
-    } else if (x > xEnd) {
-      x = x - 1;
-    } else if (x > size) {
-      x = 0
-    }
-
-    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
-
-    if(!checkBusyCell({x: x, y: y})) {
-      x = x + 1;
-      y = y + 1;
-    } else {
-      result.push({x: x, y: y})
-    }
-
-  }
-
-  while(y !== yEnd) {
-    if(y < yEnd) {
-      y = y + 1;
-    } else if (y > yEnd) {
-      y = y - 1;
-    } else if (y > size) {
-      y = 0
-    }
-
-    console.log(`ceil x: ${x}, y: ${y} is ${checkBusyCell({x: x, y: y})}`)
-
-    if(!checkBusyCell({x: x, y: y})) {
-      x = x + 1;
-      y = y + 1;
-    } else {
-      result.push({x: x, y: y})
-    }
-
-  }
-  //} else if(xStart > xEnd) {
-  //   while(xStart !== xEnd && xStart < size) {
-  //     xStart = xStart - 1;
-  //     result.push({x: xStart, y: yStart})
-  //   }
-  //}
-  // if(yStart < yEnd) {
-  //   while(yStart !== yEnd && yStart > 0) {
-  //     yStart = yStart + 1;
-  //     result.push({x: xStart, y: yStart})
-  //   }
-  // } else if(yStart > yEnd) {
-  //   while(yStart !== yEnd && yStart < size) {
-  //     yStart = yStart - 1;
-  //     result.push({x: xStart, y: yStart})
-  //   }
-  // }
-
-  return result
-}
-
-
-function checkLine(x,y) {
-
-}
-
-
-// Инициализация
-//createCells();
-setRandomItems();
-
-$('body').on('click', 'td[data-content="busy"]', function(e){
-  let $target = $(e.target).closest('td') || $(e.target);
-  if(!$target.hasClass('selected')) {
-    $ground.find('.selected').removeClass('selected');
-    $target.addClass('selected');
-    SELECT = true;
-    SELECT_ITEM = $target.find('img').attr('src');
-  } else {
-    $target.removeClass('selected');
-    SELECT = false;
-    SELECT_ITEM = '';
-  }
-});
-
-$('body').on('click', 'td[data-content="free"]', function(e){
-  if(!SELECT) {
-    return false
-  }
-
-  moveTo($(e.target).data('x'), $(e.target).data('y'), $(e.target));
-});
 
